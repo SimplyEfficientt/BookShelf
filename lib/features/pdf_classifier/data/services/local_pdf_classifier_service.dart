@@ -1,6 +1,6 @@
-import '../domain/entities/book_category.dart';
-import '../domain/entities/heuristic_score.dart';
-import '../domain/entities/pdf_metadata.dart';
+import '../../domain/entities/book_category.dart';
+import '../../domain/entities/heuristic_score.dart';
+import '../../domain/entities/pdf_metadata.dart';
 
 /// Offline-first Heuristic Classifier Service for PDF documents.
 class LocalPdfClassifierService {

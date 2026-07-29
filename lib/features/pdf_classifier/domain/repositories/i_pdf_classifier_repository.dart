@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import '../entities/book_category.dart';
 import '../entities/heuristic_score.dart';
 import '../entities/pdf_metadata.dart';
 

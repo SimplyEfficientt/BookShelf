@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:bookshelf/features/pdf_classifier/domain/entities/book_category.dart';
-import '../domain/entities/organizer_prompt.dart';
+import '../../domain/entities/organizer_prompt.dart';
 
 /// Storage Directory Manager handling physical folder organization and virtual shelf tagging.
 class StorageDirectoryOrganizerService {
