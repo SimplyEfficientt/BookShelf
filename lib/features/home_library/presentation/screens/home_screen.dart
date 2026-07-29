@@ -141,8 +141,8 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          gradient: const LinearGradient(
-            colors: [Colors.transparent, Colors.black90],
+          gradient: LinearGradient(
+            colors: [Colors.transparent, Colors.black.withOpacity(0.9)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),

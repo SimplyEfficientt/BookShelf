@@ -1,3 +1,4 @@
+# IDE and Gradle configuration files
 *.iml
 .gradle
 /local.properties
@@ -13,3 +14,14 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Flutter build and temporary cache entries
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+android/.gradle
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework

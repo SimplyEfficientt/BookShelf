@@ -23,7 +23,48 @@ class BookShelfApp extends StatelessWidget {
           surface: Color(0xFF1E1E1E),
         ),
       ),
-      home: const HomeScreen(),
+      home: const MobilePhoneFrameWrapper(
+        child: HomeScreen(),
+      ),
+    );
+  }
+}
+
+/// Responsive Wrapper displaying a sleek mobile phone shell on desktop screens.
+class MobilePhoneFrameWrapper extends StatelessWidget {
+  final Widget child;
+  const MobilePhoneFrameWrapper({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth > 500) {
+          return Scaffold(
+            backgroundColor: const Color(0xFF0A0A0A),
+            body: Center(
+              child: Container(
+                width: 412,
+                height: 840,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(36),
+                  border: Border.all(color: const Color(0xFF2E2E2E), width: 8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.8),
+                      blurRadius: 24,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: child,
+              ),
+            ),
+          );
+        }
+        return child;
+      },
     );
   }
 }
