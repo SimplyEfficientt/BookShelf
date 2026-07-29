@@ -1,27 +1,31 @@
-# IDE and Gradle configuration files
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+# Environment Secrets & Private Credentials
+.env*
+*.env
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+key.properties
 local.properties
 
-# Flutter build and temporary cache entries
+# IDE & OS Specific Files
+.idea/
+.vscode/
+*.iml
+.gradle/
+.DS_Store
+Thumbs.db
+
+# Flutter Build & Cache Artifacts
 .dart_tool/
 .flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
 build/
-android/.gradle
+android/.gradle/
+android/local.properties
 ios/Flutter/App.framework
 ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
