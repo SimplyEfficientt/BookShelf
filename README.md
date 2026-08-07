@@ -63,16 +63,21 @@ To run the app directly in your desktop web browser:
 
 ---
 
-### 📦 4. Building a Standalone Android APK Installer
+### 📦 4. Building & Installing a Standalone Android APK
 
-To generate a standalone Android `.apk` installer file for any Android device:
+To generate a deployable release `.apk` installer file for testing on any Android phone:
 
 ```bash
-flutter build apk --debug
+flutter build apk
 ```
 
-The output file will be saved at:
-`build/app/outputs/flutter-apk/app-debug.apk`
+The output APK will be saved at:
+`build/app/outputs/flutter-apk/app-release.apk`
+
+#### 📲 Installing on Your Phone:
+1. Transfer `app-release.apk` to your phone's Downloads folder (via USB, Google Drive, or Email).
+2. Tap the APK file in your phone's **File Manager** to install.
+3. **Google Play Protect Notice**: Because custom test APKs are self-signed, Play Protect will display a warning dialog. Tap **"Install anyway"** *(the text link directly above the blue OK button)* to proceed with installation.
 
 ---
 

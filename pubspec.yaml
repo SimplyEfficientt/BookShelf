@@ -22,7 +22,7 @@ dependencies:
   flutter_animate: ^4.5.0
 
   # --- PDF Core & Image Processing ---
-  pdfx: ^2.6.0
+  pdfx: 2.6.0
   image: ^4.2.0
   path_provider: ^2.1.2
 
