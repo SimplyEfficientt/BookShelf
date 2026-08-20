@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bookshelf — Home screen concepts</title>
+<style>
+  :root{
+    --canvas:#E7E3D8;
+    --canvas-ink:#221E17;
+    --canvas-dim:#847C6B;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--canvas);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--canvas-ink);
+    min-height:100vh;
+    padding:36px 16px 56px;
+  }
+  .page{max-width:920px;margin:0 auto;}
+
+  /* ---------- intro / header ---------- */
+  .intro{text-align:center;margin-bottom:26px;}
+  .eyebrow{
+    font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--canvas-dim);margin:0 0 10px;
+  }
+  h1{
+    font-size:clamp(20px,4vw,28px);margin:0 0 10px;font-weight:700;letter-spacing:-.01em;
+  }
+  .sub{
+    max-width:520px;margin:0 auto;color:var(--canvas-dim);font-size:14px;line-height:1.55;
+  }
+
+  /* ---------- switcher ---------- */
+  .switcher{
+    display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:26px 0 34px;
+  }
+  .switch-btn{
+    font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.01em;
+    padding:9px 16px;border-radius:999px;border:1px solid rgba(34,30,23,.18);
+    background:transparent;color:var(--canvas-ink);cursor:pointer;
+    transition:background .18s ease, color .18s ease, border-color .18s ease;
+  }
+  .switch-btn:hover{border-color:rgba(34,30,23,.4);}
+  .switch-btn.active{background:var(--canvas-ink);border-color:var(--canvas-ink);color:#F4F1E9;}
+
+  /* ---------- stage ---------- */
+  .stage{display:flex;flex-direction:column;align-items:center;gap:20px;}
+  .caption{
+    max-width:420px;text-align:center;font-size:13.5px;line-height:1.6;color:var(--canvas-dim);
+    min-height:60px;
+  }
+  .caption b{color:var(--canvas-ink);}
+
+  /* ---------- phone chrome ---------- */
+  .phone-frame{
+    width:min(300px,80vw);
+    aspect-ratio:300/648;
+    background:linear-gradient(160deg,#2b2b2c,#111112);
+    border-radius:46px;
+    padding:9px;
+    box-shadow:0 46px 80px -30px rgba(20,18,14,.45), 0 0 0 1px rgba(0,0,0,.05);
+    position:relative;
+    animation:frame-in .5s ease both;
+  }
+  @keyframes frame-in{from{opacity:0;transform:translateY(8px) scale(.98);}to{opacity:1;transform:none;}}
+  .phone-screen{
+    width:100%;height:100%;border-radius:38px;overflow:hidden;position:relative;background:#000;
+  }
+  .island{
+    position:absolute;top:9px;left:50%;transform:translateX(-50%);
+    width:74px;height:20px;background:#000;border-radius:12px;z-index:20;
+  }
+
+  .screen{display:none;flex-direction:column;height:100%;width:100%;overflow:hidden;}
+  .screen.active{display:flex;animation:panel-in .35s ease both;}
+  @keyframes panel-in{from{opacity:0;}to{opacity:1;}}
+
+  .statusbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 22px 2px;font-size:12px;font-weight:700;flex:0 0 auto;
+  }
+  .status-right{display:flex;align-items:center;gap:5px;}
+  .bars{display:flex;align-items:flex-end;gap:2px;height:10px;}
+  .bars span{width:3px;background:currentColor;border-radius:1px;display:block;}
+  .bars span:nth-child(1){height:4px;}
+  .bars span:nth-child(2){height:6px;}
+  .bars span:nth-child(3){height:8px;}
+  .bars span:nth-child(4){height:10px;}
+  .battery{width:21px;height:11px;border:1.3px solid currentColor;border-radius:3px;position:relative;padding:1.5px;}
+  .battery::after{content:"";position:absolute;right:-3.5px;top:3px;width:2px;height:5px;background:currentColor;border-radius:0 2px 2px 0;}
+  .battery i{display:block;height:100%;width:78%;background:currentColor;border-radius:1px;}
+
+  .icon{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto;}
+  .icon .dot{fill:currentColor;stroke:none;}
+  .icon.filled{fill:currentColor;}
+
+  .body-scroll{flex:1 1 auto;overflow:hidden;padding-bottom:4px;}
+
+  .bottom-nav{
+    flex:0 0 auto;display:flex;align-items:center;justify-content:space-around;
+    padding:10px 8px calc(14px + env(safe-area-inset-bottom,0px));
+  }
+  .nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:600;}
+
+  /* ============================================================
+     1. LEDGER  — paper / library-index aesthetic
+     ============================================================ */
+  .screen.ledger{
+    --paper:#F6F1E4; --line:#E2D8BE; --ink:#1F3550; --ink-soft:#5C7186;
+    --stamp:#A6403D; --gold:#B08A3E;
+    background:var(--paper); color:var(--ink);
+    font-family:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+  }
+  .ledger .statusbar, .ledger .bottom-nav{font-family:-apple-system,sans-serif;}
+  .ledger .topbar{padding:2px 20px 10px;flex:0 0 auto;}
+  .ledger .day{font-family:-apple-system,sans-serif;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin:0 0 2px;}
+  .ledger .wordmark{font-size:24px;font-weight:700;font-style:italic;margin:0;display:flex;align-items:center;gap:8px;}
+  .ledger .wordmark .icon{width:20px;height:20px;stroke-width:1.5;}
+
+  .ledger .search{
+    margin:12px 20px 14px;padding:10px 12px;border:1.3px solid var(--ink);border-radius:4px;
+    display:flex;align-items:center;gap:8px;font-family:-apple-system,sans-serif;font-size:12.5px;color:var(--ink-soft);
+  }
+
+  .ledger .quick{display:flex;gap:8px;padding:0 20px 16px;font-family:-apple-system,sans-serif;}
+  .ledger .qcard{
+    flex:1;border:1px solid var(--line);border-top:3px solid var(--ink);background:#FBF8EF;
+    border-radius:2px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:5px;
+  }
+  .ledger .qcard span{font-size:9.5px;font-weight:700;text-align:center;letter-spacing:.01em;}
+
+  .ledger .section-head{
+    display:flex;justify-content:space-between;align-items:baseline;padding:0 20px 6px;
+    font-family:-apple-system,sans-serif;
+  }
+  .ledger .section-head h2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;margin:0;font-weight:700;color:var(--ink-soft);}
+  .ledger .section-head a{font-size:11px;color:var(--stamp);text-decoration:none;font-weight:600;}
+  .ledger .rule{border:none;border-top:1px dashed var(--line);margin:0 20px;}
+
+  .ledger .flist{padding:6px 20px 0;font-family:-apple-system,sans-serif;}
+  .ledger .frow{display:flex;align-items:center;gap:11px;padding:11px 0;border-bottom:1px dashed var(--line);position:relative;}
+  .ledger .frow:last-child{border-bottom:none;}
+  .ledger .fdoc{color:var(--ink-soft);flex:0 0 auto;}
+  .ledger .fmeta{flex:1;min-width:0;}
+  .ledger .fmeta .name{font-family:Georgia,serif;font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .ledger .fmeta .sub{font-family:"SFMono-Regular",Menlo,Consolas,monospace;font-size:9.5px;color:var(--ink-soft);letter-spacing:.02em;margin-top:2px;}
+  .ledger .stamp{
+    font-family:-apple-system,sans-serif;font-size:8.5px;font-weight:800;letter-spacing:.06em;
+    color:var(--stamp);border:1.4px solid var(--stamp);border-radius:3px;padding:2px 6px;
+    transform:rotate(-7deg);flex:0 0 auto;
+  }
+  .ledger .star{color:var(--gold);flex:0 0 auto;}
+
+  .ledger .bottom-nav{border-top:1px solid var(--line);background:var(--paper);color:var(--ink-soft);}
+  .ledger .nav-item.on{color:var(--ink);}
+  .ledger .nav-item.on span{position:relative;}
+  .ledger .nav-item.on span::after{content:"";position:absolute;left:50%;bottom:-4px;width:14px;height:2px;background:var(--gold);transform:translateX(-50%);}
+
+  /* ============================================================
+     2. SPINE SHELF — literal bookshelf metaphor
+     ============================================================ */
+  .screen.shelf{
+    --wall:#F1E8D8; --wood:#6B4A32; --wood-dk:#4A3222; --ink:#3A2E22; --ink-soft:#8A7A66;
+    background:var(--wall); color:var(--ink); font-family:-apple-system,sans-serif;
+  }
+  .shelf .topbar{padding:2px 20px 8px;flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;}
+  .shelf .greet .h{font-size:10.5px;color:var(--ink-soft);margin:0 0 2px;}
+  .shelf .greet .wordmark{font-family:Georgia,serif;font-weight:700;font-size:21px;margin:0;}
+  .shelf .avatar{width:30px;height:30px;border-radius:50%;background:var(--wood);color:#F1E8D8;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+
+  .shelf .search{
+    margin:10px 20px 16px;padding:10px 14px;border-radius:999px;background:#E6DAC0;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.15);display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--ink-soft);
+  }
+
+  .shelf .quick{display:flex;justify-content:center;gap:16px;padding:0 20px 18px;}
+  .shelf .qbtn{display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .shelf .qbtn .ring{
+    width:38px;height:38px;border-radius:50%;border:1.6px solid var(--wood);
+    display:flex;align-items:center;justify-content:center;color:var(--wood);
+  }
+  .shelf .qbtn span{font-size:9.5px;font-weight:600;color:var(--ink-soft);}
+
+  .shelf .shelf-label{padding:0 20px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
+  .shelf .shelf-row{position:relative;padding:4px 20px 26px;}
+  .shelf .plank{
+    position:absolute;left:0;right:0;bottom:14px;height:10px;background:linear-gradient(180deg,var(--wood),var(--wood-dk));
+  }
+  .shelf .spines{display:flex;gap:6px;overflow:hidden;position:relative;z-index:2;padding-bottom:9px;}
+  .shelf .spine{
+    flex:0 0 auto;width:34px;height:118px;border-radius:5px 5px 3px 3px;
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+    padding-bottom:8px;box-shadow:1px 0 0 rgba(0,0,0,.08) inset, -1px 0 0 rgba(255,255,255,.12) inset, 0 6px 8px -4px rgba(0,0,0,.35);
+    position:relative;
+  }
+  .shelf .spine .band{position:absolute;top:14px;left:0;right:0;height:3px;background:rgba(255,255,255,.35);}
+  .shelf .spine .t{
+    writing-mode:vertical-rl;transform:rotate(180deg);font-size:9.5px;font-weight:700;color:rgba(255,255,255,.95);
+    letter-spacing:.02em;white-space:nowrap;max-height:88px;overflow:hidden;text-overflow:ellipsis;
+  }
+  .shelf .c1{background:#C1694F;} .shelf .c2{background:#35516E;} .shelf .c3{background:#6E8F71;}
+  .shelf .c4{background:#D2A24C;} .shelf .c5{background:#7C5B82;} .shelf .c6{background:#3E7C7B;}
+
+  .shelf .all-label{padding:2px 20px 8px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);}
+  .shelf .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:0 20px 14px;}
+  .shelf .cover{background:#fff;border-radius:6px;padding:8px 7px;box-shadow:0 3px 8px -3px rgba(58,46,34,.25);}
+  .shelf .cover .cbar{height:5px;border-radius:2px;margin-bottom:7px;}
+  .shelf .cover .cline{height:3px;border-radius:2px;background:#E7DFCF;margin-bottom:4px;}
+  .shelf .cover .cline.w60{width:60%;}
+  .shelf .cover .ctag{font-size:8px;color:var(--ink-soft);margin-top:5px;font-weight:600;}
+
+  .shelf .fab{
+    position:absolute;right:16px;bottom:78px;width:44px;height:44px;border-radius:50%;
+    background:var(--wood);color:#F1E8D8;display:flex;align-items:center;justify-content:center;
+    box-shadow:0 10px 18px -6px rgba(58,46,34,.5);z-index:10;
+  }
+
+  .shelf .bottom-nav{background:#E9DEC7;color:var(--ink-soft);border-top:1px solid #DCCDA9;}
+  .shelf .nav-item.on{color:var(--wood);}
+  .shelf .nav-item.on span::after{content:"";display:block;width:16px;height:3px;background:var(--wood);border-radius:2px;margin:3px auto 0;}
+
+  /* ============================================================
+     3. STUDIO DARK — tool-like, progress-ring hero
+     ============================================================ */
+  .screen.studio{
+    --bg:#16130F; --surf:#211C16; --surf2:#2A231B; --text:#F3EEE4; --dim:#A79C8C;
+    --amber:#E8A33D; --violet:#9C90C0;
+    background:var(--bg); color:var(--text); font-family:-apple-system,sans-serif;
+  }
+  .studio .topbar{padding:4px 20px 6px;flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;}
+  .studio .eyebrow2{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);}
+  .studio .mark{display:flex;align-items:center;gap:8px;}
+  .studio .mark .icon{color:var(--amber);}
+  .studio .avatar{width:26px;height:26px;border-radius:50%;background:var(--surf2);border:1px solid rgba(243,238,228,.15);}
+
+  .studio .hero{
+    margin:12px 20px 16px;background:var(--surf);border-radius:16px;padding:14px;
+    display:flex;gap:12px;align-items:center;border:1px solid rgba(243,238,228,.06);
+  }
+  .studio .hero .thumb{
+    width:46px;height:60px;border-radius:5px;background:var(--surf2);flex:0 0 auto;
+    display:flex;flex-direction:column;justify-content:center;gap:3px;padding:8px 6px;
+  }
+  .studio .hero .thumb i{display:block;height:2px;background:rgba(243,238,228,.25);border-radius:2px;}
+  .studio .hero .thumb i:nth-child(2){width:70%;}
+  .studio .hero-mid{flex:1;min-width:0;}
+  .studio .hero-mid .title{font-size:13.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .studio .hero-mid .pages{font-family:"SFMono-Regular",Menlo,monospace;font-size:10px;color:var(--dim);margin-top:3px;}
+  .studio .hero-mid .cta{font-size:10.5px;color:var(--amber);font-weight:700;margin-top:8px;}
+  .studio .ring-wrap{flex:0 0 auto;width:44px;height:44px;position:relative;}
+  .studio .ring-wrap svg{width:44px;height:44px;transform:rotate(-90deg);}
+  .studio .ring-wrap .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:var(--amber);}
+
+  .studio .quick{display:flex;gap:8px;padding:0 20px 16px;overflow:hidden;}
+  .studio .chip{
+    flex:0 0 auto;display:flex;align-items:center;gap:6px;background:var(--surf2);
+    border-radius:999px;padding:8px 12px;font-size:11px;font-weight:600;color:var(--dim);
+    border:1px solid rgba(243,238,228,.06);
+  }
+  .studio .chip.on{color:var(--bg);background:var(--amber);border-color:var(--amber);}
+  .studio .chip .icon{width:15px;height:15px;}
+
+  .studio .section-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 20px 10px;}
+  .studio .section-head h2{font-size:11px;letter-spacing:.08em;text-transform:uppercase;margin:0;font-weight:700;color:var(--dim);}
+  .studio .section-head span{font-size:10.5px;color:var(--dim);}
+
+  .studio .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px 14px;}
+  .studio .card{background:var(--surf);border-radius:12px;padding:10px;border:1px solid rgba(243,238,228,.06);}
+  .studio .card .prev{height:46px;border-radius:7px;background:var(--surf2);margin-bottom:8px;padding:8px;display:flex;flex-direction:column;gap:3px;justify-content:center;}
+  .studio .card .prev i{display:block;height:2px;border-radius:2px;background:rgba(243,238,228,.2);}
+  .studio .card .prev i:nth-child(2){width:65%;}
+  .studio .card .tag{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:5px;}
+  .studio .card .name{font-size:11px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
+  .studio .card .meta{font-family:"SFMono-Regular",Menlo,monospace;font-size:9px;color:var(--dim);margin-top:4px;}
+
+  .studio .bottom-nav{background:var(--surf);border-top:1px solid rgba(243,238,228,.06);color:var(--dim);}
+  .studio .nav-item.on{color:var(--bg);}
+  .studio .nav-item.on .iconwrap{background:var(--amber);border-radius:999px;padding:5px 12px;color:var(--bg);}
+  .studio .nav-item .iconwrap{padding:5px 12px;}
+
+  /* ============================================================
+     4. FOLDER DESK — organized workspace / manila folders
+     ============================================================ */
+  .screen.desk{
+    --canvas2:#EEEAE1; --panel:#FFFFFF; --ink:#2B2A28; --dim:#736C60;
+    --tan:#D8B77C; --forest:#3F5A46; --flag:#B5533D;
+    background:var(--canvas2); color:var(--ink); font-family:-apple-system,sans-serif;
+  }
+  .desk .topbar{padding:4px 20px 8px;flex:0 0 auto;display:flex;justify-content:space-between;align-items:center;}
+  .desk .topbar h1{font-size:18px;margin:0;font-weight:800;}
+  .desk .avatar{width:28px;height:28px;border-radius:8px;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;}
+
+  .desk .storage{margin:6px 20px 14px;background:var(--panel);border-radius:12px;padding:12px 14px;box-shadow:0 2px 6px rgba(43,42,40,.06);}
+  .desk .storage .row{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:7px;}
+  .desk .storage .row b{color:var(--ink);font-weight:700;}
+  .desk .storage .bar{height:5px;border-radius:3px;background:#EAE6DC;overflow:hidden;}
+  .desk .storage .bar i{display:block;height:100%;width:55%;background:var(--forest);border-radius:3px;}
+
+  .desk .search{margin:0 20px 14px;padding:10px 12px;border-radius:10px;background:var(--panel);border:1px solid #E4E0D5;display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim);box-shadow:0 2px 6px rgba(43,42,40,.04);}
+
+  .desk .folders{display:flex;gap:9px;padding:0 20px 16px;overflow:hidden;}
+  .desk .folder{flex:0 0 auto;width:58px;text-align:center;}
+  .desk .folder .tab{
+    width:58px;height:42px;background:var(--tan);border-radius:4px 8px 8px 8px;position:relative;
+    display:flex;align-items:center;justify-content:center;color:#6B5227;box-shadow:0 3px 6px -2px rgba(43,42,40,.25);
+  }
+  .desk .folder .tab::before{content:"";position:absolute;top:-6px;left:0;width:26px;height:6px;background:var(--tan);border-radius:4px 4px 0 0;}
+  .desk .folder span{display:block;font-size:9.5px;font-weight:700;margin-top:6px;color:var(--dim);}
+
+  .desk .quick{display:flex;background:var(--panel);border-radius:12px;margin:0 20px 16px;padding:10px 4px;box-shadow:0 2px 6px rgba(43,42,40,.06);}
+  .desk .qbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--forest);}
+  .desk .qbtn span{font-size:9px;font-weight:700;color:var(--dim);}
+
+  .desk .section-head{display:flex;justify-content:space-between;align-items:baseline;padding:0 20px 8px;}
+  .desk .section-head h2{font-size:12px;margin:0;font-weight:800;}
+  .desk .section-head a{font-size:11px;color:var(--forest);font-weight:700;text-decoration:none;}
+
+  .desk .flist{padding:0 20px;display:flex;flex-direction:column;gap:8px;}
+  .desk .frow{background:var(--panel);border-radius:10px;padding:10px 11px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 5px rgba(43,42,40,.05);}
+  .desk .frow .fdoc{color:var(--forest);flex:0 0 auto;}
+  .desk .frow .fmeta{flex:1;min-width:0;}
+  .desk .frow .name{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .desk .frow .sub{font-size:10px;color:var(--dim);margin-top:2px;}
+  .desk .frow .flag{color:var(--flag);flex:0 0 auto;}
+
+  .desk .bottom-nav{background:var(--panel);border-top:1px solid #E4E0D5;color:var(--dim);}
+  .desk .nav-item.on{color:var(--forest);}
+
+  /* ---------- footer / responsive ---------- */
+  @media (max-width:420px){
+    body{padding:26px 12px 44px;}
+    .switch-btn{font-size:12px;padding:8px 13px;}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="intro">
+    <p class="eyebrow">UI exploration — Bookshelf</p>
+    <h1>Home screen, four directions</h1>
+    <p class="sub">Same brief every time — recent files, quick actions, tab nav to Browse / Search / Settings — styled four different ways. Tap a tab to switch.</p>
+  </div>
+
+  <div class="switcher" role="tablist">
+    <button class="switch-btn active" data-target="ledger">Ledger</button>
+    <button class="switch-btn" data-target="shelf">Spine Shelf</button>
+    <button class="switch-btn" data-target="studio">Studio Dark</button>
+    <button class="switch-btn" data-target="desk">Folder Desk</button>
+  </div>
+
+  <div class="stage">
+    <div class="phone-frame">
+      <div class="phone-screen">
+        <div class="island"></div>
+
+        <!-- ============ 1. LEDGER ============ -->
+        <div class="screen ledger active" id="ledger">
+          <div class="statusbar">
+            <span>9:41</span>
+            <span class="status-right">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"><i></i></span>
+            </span>
+          </div>
+          <div class="topbar">
+            <p class="day">Tuesday, 20 August</p>
+            <p class="wordmark"><svg class="icon"><use href="#i-book"/></svg>Bookshelf</p>
+          </div>
+          <div class="search"><svg class="icon" style="width:15px;height:15px"><use href="#i-search"/></svg>Search your shelf…</div>
+          <div class="quick">
+            <div class="qcard"><svg class="icon" style="width:16px;height:16px"><use href="#i-scan"/></svg><span>Scan</span></div>
+            <div class="qcard"><svg class="icon" style="width:16px;height:16px"><use href="#i-upload"/></svg><span>Import</span></div>
+            <div class="qcard"><svg class="icon" style="width:16px;height:16px"><use href="#i-merge"/></svg><span>Merge</span></div>
+            <div class="qcard"><svg class="icon" style="width:16px;height:16px"><use href="#i-folder"/></svg><span>New Folder</span></div>
+          </div>
+          <div class="body-scroll">
+            <div class="section-head"><h2>Recently opened</h2><a href="#">See all</a></div>
+            <hr class="rule">
+            <div class="flist">
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Lease Agreement</div><div class="sub">9 PP · 1.1 MB · TODAY</div></div>
+                <span class="stamp">NEW</span>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Tax Return 2025</div><div class="sub">22 PP · 3.8 MB · YESTERDAY</div></div>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Resume — Final</div><div class="sub">2 PP · 240 KB · 3 DAYS AGO</div></div>
+                <svg class="icon star filled" style="width:15px;height:15px"><use href="#i-star"/></svg>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Recipe Box Vol. 2</div><div class="sub">48 PP · 6.1 MB · LAST WEEK</div></div>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Course Notes — DB</div><div class="sub">31 PP · 4.4 MB · LAST WEEK</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item on"><svg class="icon"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-folder"/></svg><span>Browse</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-search"/></svg><span>Search</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></div>
+          </div>
+        </div>
+
+        <!-- ============ 2. SPINE SHELF ============ -->
+        <div class="screen shelf" id="shelf">
+          <div class="statusbar">
+            <span>9:41</span>
+            <span class="status-right">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"><i></i></span>
+            </span>
+          </div>
+          <div class="topbar">
+            <div class="greet"><p class="h">Good evening</p><p class="wordmark">Bookshelf</p></div>
+            <div class="avatar">RR</div>
+          </div>
+          <div class="search"><svg class="icon" style="width:15px;height:15px"><use href="#i-search"/></svg>Find a book…</div>
+          <div class="quick">
+            <div class="qbtn"><div class="ring"><svg class="icon" style="width:16px;height:16px"><use href="#i-scan"/></svg></div><span>Scan</span></div>
+            <div class="qbtn"><div class="ring"><svg class="icon" style="width:16px;height:16px"><use href="#i-upload"/></svg></div><span>Import</span></div>
+            <div class="qbtn"><div class="ring"><svg class="icon" style="width:16px;height:16px"><use href="#i-merge"/></svg></div><span>Merge</span></div>
+            <div class="qbtn"><div class="ring"><svg class="icon" style="width:16px;height:16px"><use href="#i-folder"/></svg></div><span>Folder</span></div>
+          </div>
+          <div class="body-scroll">
+            <p class="shelf-label">Continue reading</p>
+            <div class="shelf-row">
+              <div class="plank"></div>
+              <div class="spines">
+                <div class="spine c1"><div class="band"></div><span class="t">Lease Agreement</span></div>
+                <div class="spine c2"><div class="band"></div><span class="t">Tax Return '25</span></div>
+                <div class="spine c3"><div class="band"></div><span class="t">Resume — Final</span></div>
+                <div class="spine c4"><div class="band"></div><span class="t">Design Notes</span></div>
+                <div class="spine c5"><div class="band"></div><span class="t">Recipe Box</span></div>
+                <div class="spine c6"><div class="band"></div><span class="t">DB Systems</span></div>
+              </div>
+            </div>
+            <p class="all-label">All files</p>
+            <div class="grid">
+              <div class="cover"><div class="cbar" style="background:#C1694F"></div><div class="cline"></div><div class="cline w60"></div><div class="ctag">Personal</div></div>
+              <div class="cover"><div class="cbar" style="background:#35516E"></div><div class="cline"></div><div class="cline w60"></div><div class="ctag">Personal</div></div>
+              <div class="cover"><div class="cbar" style="background:#6E8F71"></div><div class="cline"></div><div class="cline w60"></div><div class="ctag">Work</div></div>
+              <div class="cover"><div class="cbar" style="background:#D2A24C"></div><div class="cline"></div><div class="cline w60"></div><div class="ctag">School</div></div>
+              <div class="cover"><div class="cbar" style="background:#7C5B82"></div><div class="cline"></div><div class="cline w60"></div><div class="ctag">Personal</div></div>
+              <div class="cover"><div class="cbar" style="background:#3E7C7B"></div><div class="cline"></div><div class="cline w60"></div><div class="ctag">School</div></div>
+            </div>
+          </div>
+          <div class="fab"><svg class="icon" style="stroke:#F1E8D8;width:20px;height:20px"><use href="#i-plus"/></svg></div>
+          <div class="bottom-nav">
+            <div class="nav-item on"><svg class="icon"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-folder"/></svg><span>Browse</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-search"/></svg><span>Search</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></div>
+          </div>
+        </div>
+
+        <!-- ============ 3. STUDIO DARK ============ -->
+        <div class="screen studio" id="studio">
+          <div class="statusbar">
+            <span>9:41</span>
+            <span class="status-right">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"><i></i></span>
+            </span>
+          </div>
+          <div class="topbar">
+            <div><p class="eyebrow2">Continue where you left off</p></div>
+            <div class="mark"><svg class="icon"><use href="#i-book"/></svg><div class="avatar"></div></div>
+          </div>
+          <div class="hero">
+            <div class="thumb"><i></i><i></i><i></i></div>
+            <div class="hero-mid">
+              <div class="title">Design Systems Handbook</div>
+              <div class="pages">PAGE 42 / 96</div>
+              <div class="cta">Resume reading →</div>
+            </div>
+            <div class="ring-wrap">
+              <svg viewBox="0 0 44 44">
+                <circle cx="22" cy="22" r="19" fill="none" stroke="#3A3226" stroke-width="4"/>
+                <circle cx="22" cy="22" r="19" fill="none" stroke="#E8A33D" stroke-width="4" stroke-linecap="round" stroke-dasharray="119.4" stroke-dashoffset="67" />
+              </svg>
+              <span class="pct">44%</span>
+            </div>
+          </div>
+          <div class="quick">
+            <div class="chip on"><svg class="icon"><use href="#i-scan"/></svg>Scan</div>
+            <div class="chip"><svg class="icon"><use href="#i-upload"/></svg>Import</div>
+            <div class="chip"><svg class="icon"><use href="#i-merge"/></svg>Merge</div>
+            <div class="chip"><svg class="icon"><use href="#i-folder"/></svg>New folder</div>
+          </div>
+          <div class="body-scroll">
+            <div class="section-head"><h2>Recent</h2><span>18 files</span></div>
+            <div class="grid">
+              <div class="card"><div class="prev"><i></i><i></i></div><div><span class="tag" style="background:#E8A33D"></span><span class="name">Lease Agreement</span></div><div class="meta">1.1 MB · 9p</div></div>
+              <div class="card"><div class="prev"><i></i><i></i></div><div><span class="tag" style="background:#9C90C0"></span><span class="name">Tax Return 2025</span></div><div class="meta">3.8 MB · 22p</div></div>
+              <div class="card"><div class="prev"><i></i><i></i></div><div><span class="tag" style="background:#7FA88A"></span><span class="name">Resume — Final</span></div><div class="meta">240 KB · 2p</div></div>
+              <div class="card"><div class="prev"><i></i><i></i></div><div><span class="tag" style="background:#E8A33D"></span><span class="name">Recipe Box Vol.2</span></div><div class="meta">6.1 MB · 48p</div></div>
+              <div class="card"><div class="prev"><i></i><i></i></div><div><span class="tag" style="background:#9C90C0"></span><span class="name">DB Systems Notes</span></div><div class="meta">4.4 MB · 31p</div></div>
+              <div class="card"><div class="prev"><i></i><i></i></div><div><span class="tag" style="background:#7FA88A"></span><span class="name">Q3 Meeting Minutes</span></div><div class="meta">610 KB · 5p</div></div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item on"><span class="iconwrap"><svg class="icon"><use href="#i-home"/></svg></span></div>
+            <div class="nav-item"><span class="iconwrap"><svg class="icon"><use href="#i-folder"/></svg></span></div>
+            <div class="nav-item"><span class="iconwrap"><svg class="icon"><use href="#i-search"/></svg></span></div>
+            <div class="nav-item"><span class="iconwrap"><svg class="icon"><use href="#i-settings"/></svg></span></div>
+          </div>
+        </div>
+
+        <!-- ============ 4. FOLDER DESK ============ -->
+        <div class="screen desk" id="desk">
+          <div class="statusbar">
+            <span>9:41</span>
+            <span class="status-right">
+              <span class="bars"><span></span><span></span><span></span><span></span></span>
+              <span class="battery"><i></i></span>
+            </span>
+          </div>
+          <div class="topbar"><h1>Home</h1><div class="avatar">RR</div></div>
+          <div class="storage">
+            <div class="row"><span>Storage</span><b>8.2 GB of 15 GB used</b></div>
+            <div class="bar"><i></i></div>
+          </div>
+          <div class="search"><svg class="icon" style="width:15px;height:15px"><use href="#i-search"/></svg>Search files and folders…</div>
+          <div class="folders">
+            <div class="folder"><div class="tab"><svg class="icon" style="stroke:#6B5227;width:18px;height:18px"><use href="#i-folder"/></svg></div><span>Work</span></div>
+            <div class="folder"><div class="tab"><svg class="icon" style="stroke:#6B5227;width:18px;height:18px"><use href="#i-folder"/></svg></div><span>Personal</span></div>
+            <div class="folder"><div class="tab"><svg class="icon" style="stroke:#6B5227;width:18px;height:18px"><use href="#i-folder"/></svg></div><span>Receipts</span></div>
+            <div class="folder"><div class="tab"><svg class="icon" style="stroke:#6B5227;width:18px;height:18px"><use href="#i-folder"/></svg></div><span>Signed</span></div>
+            <div class="folder"><div class="tab"><svg class="icon" style="stroke:#6B5227;width:18px;height:18px"><use href="#i-folder"/></svg></div><span>Shared</span></div>
+          </div>
+          <div class="quick">
+            <div class="qbtn"><svg class="icon"><use href="#i-scan"/></svg><span>Scan</span></div>
+            <div class="qbtn"><svg class="icon"><use href="#i-upload"/></svg><span>Import</span></div>
+            <div class="qbtn"><svg class="icon"><use href="#i-merge"/></svg><span>Merge</span></div>
+            <div class="qbtn"><svg class="icon"><use href="#i-plus"/></svg><span>New</span></div>
+          </div>
+          <div class="body-scroll">
+            <div class="section-head"><h2>Recent files</h2><a href="#">See all</a></div>
+            <div class="flist">
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Lease Agreement</div><div class="sub">Modified today · 1.1 MB</div></div>
+                <svg class="icon flag filled" style="width:15px;height:15px"><use href="#i-star"/></svg>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Tax Return 2025</div><div class="sub">Modified yesterday · 3.8 MB</div></div>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Resume — Final</div><div class="sub">Modified 3 days ago · 240 KB</div></div>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">Q3 Meeting Minutes</div><div class="sub">Modified last week · 610 KB</div></div>
+              </div>
+              <div class="frow">
+                <svg class="icon fdoc"><use href="#i-doc"/></svg>
+                <div class="fmeta"><div class="name">DB Systems Notes</div><div class="sub">Modified last week · 4.4 MB</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="bottom-nav">
+            <div class="nav-item on"><svg class="icon"><use href="#i-home"/></svg><span>Home</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-folder"/></svg><span>Browse</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-search"/></svg><span>Search</span></div>
+            <div class="nav-item"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <p class="caption" id="caption"><b>Ledger —</b> library-index paper aesthetic. Ruled dividers and a rubber-stamp accent do the organizing instead of boxes and shadows.</p>
+  </div>
+</div>
+
+<svg style="display:none">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11 L12 4 L21 11 M5 10 V20 H19 V10"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7 H9 L11 9 H21 V18 H3 Z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="20" y2="20"/></symbol>
+  <symbol id="i-settings" viewBox="0 0 24 24">
+    <line x1="4" y1="7" x2="20" y2="7"/><circle class="dot" cx="9" cy="7" r="2"/>
+    <line x1="4" y1="12" x2="20" y2="12"/><circle class="dot" cx="16" cy="12" r="2"/>
+    <line x1="4" y1="17" x2="20" y2="17"/><circle class="dot" cx="11" cy="17" r="2"/>
+  </symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24">
+    <path d="M4 9 V5 H9"/><path d="M15 5 H19 V9"/><path d="M4 15 V19 H9"/><path d="M19 15 V19 H15"/>
+  </symbol>
+  <symbol id="i-merge" viewBox="0 0 24 24"><path d="M12 3 L21 8 L12 13 L3 8 Z"/><path d="M3 13 L12 18 L21 13"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15 V4 M8 8 L12 4 L16 8"/><path d="M4 17 V20 H20 V17"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3 H14 L18 7 V21 H6 Z"/><path d="M14 3 V7 H18"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3 L14.7 9 L21 9.8 L16.3 14 L17.6 20.3 L12 17 L6.4 20.3 L7.7 14 L3 9.8 L9.3 9 Z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5 C9 3 5 3 3 4 V18 C5 17 9 17 12 19 C15 17 19 17 21 18 V4 C19 3 15 3 12 5 Z"/><line x1="12" y1="5" x2="12" y2="19"/></symbol>
+</svg>
+
+<script>
+  var captions = {
+    ledger: '<b>Ledger —</b> library-index paper aesthetic. Ruled dividers and a rubber-stamp accent do the organizing instead of boxes and shadows.',
+    shelf: '<b>Spine Shelf —</b> the literal read. Recent files sit as book spines you scroll sideways; everything else lives below as covers. Leans into the app name on purpose.',
+    studio: '<b>Studio Dark —</b> a tool-like home for someone who lives in this app. "Continue reading" hero with a progress ring, dense grid, amber as the one accent that means "yours."',
+    desk: '<b>Folder Desk —</b> utility-first. Storage and folders up top like a desk organizer, a flat list below. Built for managing a lot of documents, not browsing a shelf.'
+  };
+  var btns = document.querySelectorAll('.switch-btn');
+  var screens = document.querySelectorAll('.screen');
+  var caption = document.getElementById('caption');
+  btns.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var target = btn.getAttribute('data-target');
+      btns.forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      screens.forEach(function(s){ s.classList.remove('active'); });
+      document.getElementById(target).classList.add('active');
+      caption.innerHTML = captions[target];
+    });
+  });
+</script>
+</body>
+</html>
