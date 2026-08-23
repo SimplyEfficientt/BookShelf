@@ -13,6 +13,8 @@ class BookItem {
   final DateTime lastReadTimestamp;
   final List<String> virtualShelves;
 
+  final int fileSizeBytes;
+
   const BookItem({
     required this.id,
     required this.filePath,
@@ -24,7 +26,14 @@ class BookItem {
     required this.totalPages,
     required this.lastReadTimestamp,
     this.virtualShelves = const [],
+    this.fileSizeBytes = 1153433, // Default 1.1 MB placeholder
   });
+
+  /// Formatted file size and page count (e.g. "1.1 MB • 9p")
+  String get formattedSizeAndPages {
+    final mb = (fileSizeBytes / (1024 * 1024)).toStringAsFixed(1);
+    return '$mb MB • ${totalPages}p';
+  }
 
   /// Calculates exact reading progress percentage.
   double get progressPercentage => totalPages > 0 ? (currentPage / totalPages).clamp(0.0, 1.0) : 0.0;
