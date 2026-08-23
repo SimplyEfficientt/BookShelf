@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:bookshelf/core/theme/app_theme.dart';
 import 'features/home_library/presentation/screens/home_screen.dart';
 
 void main() {
@@ -13,18 +14,11 @@ class BookShelfApp extends StatelessWidget {
     return MaterialApp(
       title: 'BookShelf',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: const Color(0xFFE50914),
-        scaffoldBackgroundColor: const Color(0xFF141414),
-        colorScheme: const ColorScheme.dark(
-          primary: Color(0xFFE50914),
-          secondary: Color(0xFFE50914),
-          surface: Color(0xFF1E1E1E),
-        ),
-      ),
+      theme: AppTheme.lightThemeData(context),
+      darkTheme: AppTheme.darkThemeData(context),
+      themeMode: ThemeMode.system,
       home: const MobilePhoneFrameWrapper(
-        child: HomeScreen(),
+        child: HomeScreen(initialDarkMode: true),
       ),
     );
   }
@@ -44,16 +38,16 @@ class MobilePhoneFrameWrapper extends StatelessWidget {
             backgroundColor: const Color(0xFF0A0A0A),
             body: Center(
               child: Container(
-                width: 412,
-                height: 840,
+                width: 400,
+                height: 820,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(36),
-                  border: Border.all(color: const Color(0xFF2E2E2E), width: 8),
+                  borderRadius: BorderRadius.circular(40),
+                  border: Border.all(color: const Color(0xFF2A2D3A), width: 8),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.8),
-                      blurRadius: 24,
-                      offset: const Offset(0, 10),
+                      blurRadius: 30,
+                      offset: const Offset(0, 12),
                     ),
                   ],
                 ),
